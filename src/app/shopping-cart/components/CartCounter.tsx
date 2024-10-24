@@ -1,6 +1,6 @@
 'use client'
-import { useState } from "react";
-
+import { useAppDispatch, useAppSelector } from "@/store";
+import { addOne, substractOne } from "@/store/counter/counterSlice";
 
 interface Props {
   value?: number;
@@ -9,26 +9,24 @@ interface Props {
 
 export const CartCounter = ({ value = 0 }: Props) => {
 
-  const [counter, setCounter] = useState(value);
+  // const [counter, setCounter] = useState(value);
 
-  const incrementar = (numero: number = 1): void => {
-    setCounter(counter + numero)
-  }
+  // hacemos uso de nuestro state global con el hook useAppSelector
+  const count = useAppSelector( state => state.counter.count)
 
-  const decrementar = (numero: number = 1): void => {
-    setCounter(counter - numero)
-  }
+  // ahora tomamos el dispatch  con el hook useAppDispatch
+  const dispatch = useAppDispatch()
 
   return (
     <div className="flex flex-col items-center justify-center ">
       <span className="text-9xl">
-        {counter}
+        {count}
       </span>
       <div className="flex">
         <button className="flex items-center justify-center p-2 rounded-xl bg-gray-900 text-white hover:bg-gray-600 transition-all w-[100px] mr-2 "
-          onClick={() => incrementar()}
+          onClick={() => dispatch(addOne())}
         >+1</button>
-        <button className="flex items-center justify-center p-2 rounded-xl bg-gray-900 text-white hover:bg-gray-600 transition-all w-[100px] mr-2 " onClick={() => decrementar()}>-1</button>
+        <button className="flex items-center justify-center p-2 rounded-xl bg-gray-900 text-white hover:bg-gray-600 transition-all w-[100px] mr-2 " onClick={() => dispatch( substractOne())}>-1</button>
       </div>
     </div>
   )

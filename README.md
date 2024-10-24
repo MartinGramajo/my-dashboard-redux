@@ -64,39 +64,36 @@ _Nota_: Si bien esta implementación no es perfecto, pero cumple con su finalida
 
 ### Counter Slice
 
-3. Un *slice* o *state slice* es una porción o sección del estado global que se maneja de forma independiente. 
+3. Un _slice_ o _state slice_ es una porción o sección del estado global que se maneja de forma independiente.
 
 Cada slice contiene la lógica necesaria para gestionar una parte especifica del estado de la aplicación, agrupando tanto el estado como los reducers y las acciones relaciones en un solo lugar.
-Cuando definimos un slice, definimos: 
+Cuando definimos un slice, definimos:
 
-- *El estado inicial* 
+- _El estado inicial_
 
-- *Los reducers* que modifican ese estado en respuesta a las acciones. Es decir, llamamos a las acciones de cualquier lugar de nuestro app para que cambien el valor del estado inicial.
+- _Los reducers_ que modifican ese estado en respuesta a las acciones. Es decir, llamamos a las acciones de cualquier lugar de nuestro app para que cambien el valor del estado inicial.
 
-- *Las Acciones* que se generan automáticamente según los reducers.
+- _Las Acciones_ que se generan automáticamente según los reducers.
 
-_NOTA_: Se aconseja que los *state* cuando creamos su interface siempre sean *object* para poder extenderlo de manera mas fácil. 
+_NOTA_: Se aconseja que los _state_ cuando creamos su interface siempre sean _object_ para poder extenderlo de manera mas fácil.
 
-Por otra parte, podemos crear el slice donde nosotros creamos convenientes, en este caso, lo creamos dentro de la carpeta *store* para tener todo agrupado.
+Por otra parte, podemos crear el slice donde nosotros creamos convenientes, en este caso, lo creamos dentro de la carpeta _store_ para tener todo agrupado.
 
-```js 
+```js
+// snippet para la creación:  rxslice
 
-
-// snippet para la creación:  rxslice 
-
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 interface CounterState {
   count: number;
 }
 
-
 const initialState: CounterState = {
   count: 5
-}
+};
 
 const counterSlice = createSlice({
-  name: 'counter',
+  name: "counter",
   initialState,
   reducers: {}
 });
@@ -104,32 +101,30 @@ const counterSlice = createSlice({
 export const {} = counterSlice.actions;
 
 export default counterSlice.reducer;
-
 ```
 
-4. En la carpeta *store* en el archivo *index.ts*  tenemos que importa el *counterSlice* que creamos en el punto 3  y utilizarlo dentro de nuestro reducer: 
+4. En la carpeta _store_ en el archivo _index.ts_ tenemos que importa el _counterSlice_ que creamos en el punto 3 y utilizarlo dentro de nuestro reducer:
 
-```js 
-import { configureStore } from '@reduxjs/toolkit'
+```js
+import { configureStore } from "@reduxjs/toolkit";
 
-import counterReducer from './counter/counterSlice'
-
+import counterReducer from "./counter/counterSlice";
 
 export const store = configureStore({
   reducer: {
-    counterReducer,
-  },
-})
-
+    counterReducer
+  }
+});
 ```
 
-### Exportando redux toolkit hooks 
+### Exportando redux toolkit hooks
 
-5. Una vez importado el archivo de counterSlice y utilizado en el reducer, dentro de la documentación nos tenemos que ir al apartado *Redux Toolkit TypeScript Quick Start*  para poder configurar los hooks que nos recomienda para utilizarlo en lugar del useDispatch (es un hook que nos retorna la *función dispatch* que se comunica con nuestro store para hacer el dispatch de acciones ) y el useSelector (sirve para tomar cierta parte de nuestro state y que cuando esa parte del state cambie o se modifique podamos redibujar nuestro componente). Esto se debe a que estamos haciendo uso de Typescript.
+5. Una vez importado el archivo de counterSlice y utilizado en el reducer, dentro de la documentación nos tenemos que ir al apartado _Redux Toolkit TypeScript Quick Start_ para poder configurar los hooks que nos recomienda para utilizarlo en lugar del useDispatch (es un hook que nos retorna la _función dispatch_ que se comunica con nuestro store para hacer el dispatch de acciones ) y el useSelector (sirve para tomar cierta parte de nuestro state y que cuando esa parte del state cambie o se modifique podamos redibujar nuestro componente). Esto se debe a que estamos haciendo uso de Typescript.
 
-Entonces usaremos: 
-- *useAppDispatch* para disparar acciones.
-- *useAppSelector* para escuchar y leer como esta nuestro store.
+Entonces usaremos:
+
+- _useAppDispatch_ para disparar acciones.
+- _useAppSelector_ para escuchar y leer como esta nuestro store.
 
 ```js
 import { configureStore } from '@reduxjs/toolkit'
@@ -155,5 +150,74 @@ export const useAppSelector = useSelector.withTypes<RootState>();
 ```
 
 _Con estas configuraciones ya estamos listo para utilizar nuestro counterSlice._
+
+### Counter Reducer y acciones
+
+Ahora nos toca crear las acciones que van a mutar nuestro state inicial. Para ello, vamos a trabajar en el archivo _counterSlice.ts_ en el apartado de los reducers creando nuestras acciones.
+
+```js
+const counterSlice = createSlice({
+  name: "counter",
+  initialState,
+  reducers: {
+    addOne(state) {
+      state.count++;
+    },
+    substractOne(state) {
+      if (state.count === 0) return;
+      state.count--;
+    },
+
+    resetCount(state, action: PayloadAction<number>) {
+      if (action.payload < 0) action.payload = 0;
+      state.count = action.payload;
+    }
+  }
+});
+```
+
+En el caso del reducer -> resetCounter ademas de recibir el state, también vamos a tener el _action_. Este _action_ sirve para cambiar o recibir un argumento.
+Por otra parte, este action va a tener el _PayloadAction_ (que tenemos que importar de redux toolkit) y el tipo de dato que espera recibir, en nuestro caso sera de tipo _number_.
+
+```js
+ resetCount(state, action: PayloadAction<number>) {
+      if (action.payload < 0) action.payload = 0;
+      state.count = action.payload;
+    }
+
+```
+
+_Nota:_ la regla de oro dentro de los reducers es que se tiene que producir un nuevo state, es decir, la mutación del state debe estar basada enteramente en las acciones.
+
+Por ultimo una vez creadas las acciones de mis reducers, las tenemos que exportar para que puedan ser utilizadas en nuestra app.
+
+```js
+export const { addOne, substractOne, resetCount } = counterSlice.actions;
+```
+
+#### Como lo utilizamos?
+
+Nos vamos a parar sobre el archivo en el que vamos a hacer uso de nuestro counterReducer, en este caso, seria app/dashboard/counter/page.tsx
+
+IMPORTANTE: en el componente o archivo donde utilicemos nuestro estado global si o si tiene que ser un _use client_.
+
+Pasos para utilizarlo 
+
+1. 
+
+
+
+#### Modificación en el store
+
+En nuestro store se recomienda tener la siguiente sintaxis dentro de nuestro reducer:
+
+```js
+export const store = configureStore({
+  reducer: {
+    counter: counterReducer
+  }
+});
+```
+
 
 
