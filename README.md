@@ -36,7 +36,7 @@ El provider es un component de React que hace que el store de Redux este disponi
 Nota: Todos mis componentes en next +13 pasan por mi _layout.txt_, no por mi page.tsx
 Esto se debe porque en mi layout es donde coloco cosas de _manera global_.
 
-#### Porque no puedo utilizar el Provider como nos indica en la documentación?
+##### Porque no puedo utilizar el Provider como nos indica en la documentación?
 
 Si colocamos el provider en nuestro archivo _layout.tsx_ (donde coloco las cosas que quiero que se rendericen de manera global) tal como nos indica la documentación, nos rompe la aplicación porque nos obliga a que utilicemos el 'use-client' y como es un archivo que no podemos utilizar el renderizado por parte del cliente tenemos que crear otro archivo.
 
@@ -61,3 +61,99 @@ export default function RootLayout({
 ```
 
 _Nota_: Si bien esta implementación no es perfecto, pero cumple con su finalidad.
+
+### Counter Slice
+
+3. Un *slice* o *state slice* es una porción o sección del estado global que se maneja de forma independiente. 
+
+Cada slice contiene la lógica necesaria para gestionar una parte especifica del estado de la aplicación, agrupando tanto el estado como los reducers y las acciones relaciones en un solo lugar.
+Cuando definimos un slice, definimos: 
+
+- *El estado inicial* 
+
+- *Los reducers* que modifican ese estado en respuesta a las acciones. Es decir, llamamos a las acciones de cualquier lugar de nuestro app para que cambien el valor del estado inicial.
+
+- *Las Acciones* que se generan automáticamente según los reducers.
+
+_NOTA_: Se aconseja que los *state* cuando creamos su interface siempre sean *object* para poder extenderlo de manera mas fácil. 
+
+Por otra parte, podemos crear el slice donde nosotros creamos convenientes, en este caso, lo creamos dentro de la carpeta *store* para tener todo agrupado.
+
+```js 
+
+
+// snippet para la creación:  rxslice 
+
+import { createSlice } from '@reduxjs/toolkit';
+
+interface CounterState {
+  count: number;
+}
+
+
+const initialState: CounterState = {
+  count: 5
+}
+
+const counterSlice = createSlice({
+  name: 'counter',
+  initialState,
+  reducers: {}
+});
+
+export const {} = counterSlice.actions;
+
+export default counterSlice.reducer;
+
+```
+
+4. En la carpeta *store* en el archivo *index.ts*  tenemos que importa el *counterSlice* que creamos en el punto 3  y utilizarlo dentro de nuestro reducer: 
+
+```js 
+import { configureStore } from '@reduxjs/toolkit'
+
+import counterReducer from './counter/counterSlice'
+
+
+export const store = configureStore({
+  reducer: {
+    counterReducer,
+  },
+})
+
+```
+
+### Exportando redux toolkit hooks 
+
+5. Una vez importado el archivo de counterSlice y utilizado en el reducer, dentro de la documentación nos tenemos que ir al apartado *Redux Toolkit TypeScript Quick Start*  para poder configurar los hooks que nos recomienda para utilizarlo en lugar del useDispatch (es un hook que nos retorna la *función dispatch* que se comunica con nuestro store para hacer el dispatch de acciones ) y el useSelector (sirve para tomar cierta parte de nuestro state y que cuando esa parte del state cambie o se modifique podamos redibujar nuestro componente). Esto se debe a que estamos haciendo uso de Typescript.
+
+Entonces usaremos: 
+- *useAppDispatch* para disparar acciones.
+- *useAppSelector* para escuchar y leer como esta nuestro store.
+
+```js
+import { configureStore } from '@reduxjs/toolkit'
+
+import counterReducer from './counter/counterSlice'
+
+// nos aseguramos de importar el useDispatch y el useSelector.
+import { useDispatch, useSelector } from 'react-redux'
+
+
+export const store = configureStore({
+  reducer: {
+    counterReducer,
+  },
+})
+export type RootState = ReturnType<typeof store.getState>
+export type AppDispatch = typeof store.dispatch
+
+// Use throughout your app instead of plain `useDispatch` and `useSelector`
+export const useAppDispatch = useDispatch.withTypes<AppDispatch>();
+export const useAppSelector = useSelector.withTypes<RootState>();
+
+```
+
+_Con estas configuraciones ya estamos listo para utilizar nuestro counterSlice._
+
+
