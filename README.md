@@ -201,11 +201,9 @@ Nos vamos a parar sobre el archivo en el que vamos a hacer uso de nuestro counte
 
 IMPORTANTE: en el componente o archivo donde utilicemos nuestro estado global si o si tiene que ser un _use client_.
 
-Pasos para utilizarlo 
+Pasos para utilizarlo
 
-1. 
-
-
+1.
 
 #### Modificación en el store
 
@@ -219,5 +217,78 @@ export const store = configureStore({
 });
 ```
 
+## DEL SERVER AL CLIENT STATE
 
+Actualmente tenemos este problema: El component cardCounter recibe un valor inicial de 20 pero no podemos usar dentro del page nuestro _use client_ esto nos quitaría la metadata que queremos conservar.
 
+```js
+export const metadata: Metadata = {
+  title: "Shopping Cart",
+  description: "Counter client side"
+};
+
+export default function CounterPage() {
+  return (
+    <div className="flex flex-col items-center justify-center w-full h-full">
+      <CartCounter value={20} />
+    </div>
+  );
+}
+```
+
+La cuestión radica: _como enviamos desde el servidor algo a nuestro client state?_
+
+1. Primera solución: aunque no es la mas viable dado que hay un pequeño momento en el que se ve el valor inicial del estado global y después se carga el valor que le estamos mandando desde el lado del servidor como asi también si modificamos el valor del count nos vuelve al valor establecido por el enviado del servidor:
+
+```js
+useEffect(() => {
+  dispatch(resetCount(value));
+}, [dispatch, value]);
+```
+
+Esta 'solución' mas que nada es para mostrarnos como es que cada vez que entramos en esa page el componente se vuelve a construir y es por esa razón que hace los efectos no deseados.
+
+2. Segunda solución: modificando el _counterSlice_. En este caso agregaremos una propiedad de preparación o loading en el inicial state:
+
+```js
+interface CounterState {
+  count: number;
+  isReady: boolean;
+}
+
+const initialState: CounterState = {
+  count: 5,
+  isReady: false
+};
+```
+
+Dentro del reducer, vamos a crear una nueva acción y la importamos
+
+```js
+  reducers: {
+
+    initCounterState(state, action:PayloadAction<number>){
+      if(state.isReady) return;
+      state.count = action.payload;
+      state.isReady = true;
+    },
+  }
+
+export const
+{
+  initCounterState,
+  addOne,
+  substractOne,
+  resetCount} = counterSlice.actions;
+```
+
+Por ultimo tenemos que usarla en nuestro componente *cardCounter*, utilizando el mismo useEffect() de la provisoria solución 1, en lugar de llamar al resetCount hacemos el llamado de nuestra nueva acción initCounterState().  
+
+```js 
+  useEffect(() => {
+    dispatch(initCounterState(value));
+  }, [dispatch, value]);
+
+```
+
+Esta solución si bien nos resuelve el tema de que se perdía la persistencia del cambio en el state global sigue por unos segundos apareciendo en pantalla el valor inicial y después el enviado por el servidor.

@@ -1,6 +1,7 @@
 'use client'
 import { useAppDispatch, useAppSelector } from "@/store";
-import { addOne, substractOne } from "@/store/counter/counterSlice";
+import { addOne, initCounterState, substractOne } from "@/store/counter/counterSlice";
+import { useEffect } from "react";
 
 interface Props {
   value?: number;
@@ -16,6 +17,12 @@ export const CartCounter = ({ value = 0 }: Props) => {
 
   // ahora tomamos el dispatch  con el hook useAppDispatch
   const dispatch = useAppDispatch()
+
+
+  // hacemos uso de la nueva acción
+  useEffect(() => {
+    dispatch(initCounterState(value));
+  }, [dispatch, value]);
 
   return (
     <div className="flex flex-col items-center justify-center ">
