@@ -303,11 +303,9 @@ La tarea consiste en:
 
 ### RESTful Api - Get Counter
 
-#### DEL SERVER AL CLIENT STATE - tercera solución para inicializar el contador 
-
 Documentación para la solución: https://nextjs.org/docs/app/building-your-application/routing/route-handlers
 
-Para la 3ra solución lo que haremos sera utilizar el archivo *route.js|ts*.
+Para la 3ra solución  para inicializar el contador lo que haremos sera utilizar el archivo *route.js|ts*.
 
 El archivo _route.ts_ se utiliza para definir rutas API personalizadas, permitiendo manejar peticiones HTTP dentro del mismo entorno de la aplicación. 
 
@@ -339,5 +337,43 @@ export async function GET(request: Request) {
         count: 100
      })
 }
+
+```
+
+
+### Valor del counter desde API - Pasos 
+
+1. Creamos la función y la interface para hacer la consulta: 
+
+```js 
+export interface CounterResponse {
+  method: string;
+  count: number;
+}
+
+const getApiCounter = async (): Promise<CounterResponse> => {
+  const data = await fetch("/api/counter").then((res) => res.json());
+  console.log(data);
+  return data
+};
+```
+Otra forma de tipar el resultado : 
+
+```js 
+const getApiCounter = async ()=> {
+  const data = await fetch("/api/counter").then((res) => res.json());
+  return data as CounterResponse;
+  console.log(data);
+  return data
+};
+
+```
+
+2. Utilizamos el useEffect para llamar a la función y utilizar el valor del retorno con nuestro dispatch
+
+```js 
+  useEffect(() => {
+    getApiCounter().then(({count})=>dispatch(initCounterState(count)))
+  }, [dispatch])
 
 ```
