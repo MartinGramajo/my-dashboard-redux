@@ -292,3 +292,12 @@ Por ultimo tenemos que usarla en nuestro componente *cardCounter*, utilizando el
 ```
 
 Esta solución si bien nos resuelve el tema de que se perdía la persistencia del cambio en el state global sigue por unos segundos apareciendo en pantalla el valor inicial y después el enviado por el servidor.
+
+### Tarea - Store, Props y Links 
+
+La tarea consiste en: 
+
+1. Agregar un nuevo componente *WidgetGrid.tsx*. 
+2. Utilizar el *SimpleWidget.tsx*. 
+3. En *SimpleWidget.tsx* enviar por Props los elementos para dibujar de manera dinámica el contenido por props.
+

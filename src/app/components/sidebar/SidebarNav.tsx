@@ -40,7 +40,7 @@ const menuItems = [
 ]
 
 
-export const Sidebar = () => {
+export const SidebarNav = () => {
   return (
     <div
       id="menu"

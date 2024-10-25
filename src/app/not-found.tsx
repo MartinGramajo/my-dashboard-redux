@@ -1,11 +1,12 @@
 import Link from "next/link";
-import { Sidebar } from "./dashboard/components";
+import { SidebarNav } from "./components";
+
 
 export default function NotFound() {
   return (
     <div className="bg-slate-100 overflow-y-scroll w-screen h-screen antialiased text-slate-300 selection:bg-blue-600 selection:text-white">
       <div className="flex">
-        <Sidebar />
+        <SidebarNav />
 
         <div className=" w-full text-slate-900">
           <main className="h-screen w-full flex flex-col justify-center items-center bg-[#1A2238]">
