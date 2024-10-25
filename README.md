@@ -1,4 +1,4 @@
-# My Dashboard - parte 3
+# My Dashboard - Redux toolkit - Parte 3 
 
 ### Continuación de la aplicación
 
