@@ -2,10 +2,7 @@
 
 // prc snippets
 
-import { SimpleWidget } from "@/app/components/simplewidget/SimpleWidget";
 import WidgetsGrid from "@/app/components/simplewidget/WidgetsGrid";
-
-
 
 
 export const metadata = {

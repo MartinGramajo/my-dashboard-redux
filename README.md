@@ -301,3 +301,43 @@ La tarea consiste en:
 2. Utilizar el *SimpleWidget.tsx*. 
 3. En *SimpleWidget.tsx* enviar por Props los elementos para dibujar de manera dinámica el contenido por props.
 
+### RESTful Api - Get Counter
+
+#### DEL SERVER AL CLIENT STATE - tercera solución para inicializar el contador 
+
+Documentación para la solución: https://nextjs.org/docs/app/building-your-application/routing/route-handlers
+
+Para la 3ra solución lo que haremos sera utilizar el archivo *route.js|ts*.
+
+El archivo _route.ts_ se utiliza para definir rutas API personalizadas, permitiendo manejar peticiones HTTP dentro del mismo entorno de la aplicación. 
+
+IMPORTANTE : El archivo _route.ts_ no debe estar nunca en el mismo nivel que *page.ts*. 
+
+#### Como creamos el archivo routes.ts 
+
+Tenemos que crear la carpeta API y dentro otra carpeta en nuestro caso seria counter y dentro de ello el archivo route.ts. 
+
+Lo hacemos de esta forma para definir al endpoint: http://localhost:3000/api/counter
+
+```js
+export async function GET(request: Request) {}
+
+```
+
+Nota: podemos utilizar los distintos métodos GET, POST, PUT, PATCH, DELETE etc. 
+En caso de hacer una consulta a los métodos que no se enviaron el retorno es un 405 method not allowed.
+
+Ahora tenemos que agregar la respuesta, la cual siempre se aconseja que sea un *OBJECT*:
+
+```js 
+
+import { NextResponse } from "next/server";
+
+export async function GET(request: Request) {
+
+    return NextResponse.json({
+        count: 100
+     })
+}
+
+```
